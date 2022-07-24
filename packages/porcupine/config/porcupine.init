@@ -5,6 +5,9 @@ USE_PROCD=1
 
 EXTRA_COMMANDS="status"
 
+# NOTE: we trust this file, so be careful with the import content
+[ -f /data/listener ] && . /data/listener
+
 start_service() {
   ps | grep -v grep | grep porcupine_launcher -q
   if [ $? -eq 0 ]; then
@@ -28,8 +31,10 @@ start_service() {
 }
 
 stop_service() {
-  # mute led
-  /bin/show_led 7 &
+  if [ -z "$MIC_LED" ] || [ "$MIC_LED" != "0" ]; then
+    # mute led
+    /bin/show_led 7 &
+  fi
 
   killall porcupine_launcher porcupine
 
